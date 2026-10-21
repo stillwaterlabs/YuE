@@ -31,17 +31,17 @@ yue2 generate --device mps --request examples/song.json --output outputs/first-s
 
 | Stage | Upstream `main`, torch 2.10.0 | This branch, torch 2.14.1 |
 |---|---:|---:|
-| Score planning | 32 s | ≈32 s⁵ |
+| Score planning | 32 s (1,266 tokens) | 30 s (1,194 tokens)⁵ |
 | Semantic decode | does not finish on 64 GB¹; 231 s with the cache released² | 146 s³ |
 | Acoustic synthesis | 598 s | ≈225 s⁴ |
-| Audio decoding | 9 s | ≈9 s⁵ |
-| **Total** | **≈870 s** | **≈410 s** |
+| Audio decoding | 9 s | 5 s |
+| **Total** | **≈870 s** | **≈405 s** |
 
 1. Real decode with sampling: the MPS driver allocation stays near 8 GB for 3,000 tokens, then grows by about 10 GB every 256 tokens and reaches 48.9 GB at 4,096 tokens, where the run was stopped. With torch 2.14.1 it stays at 7.9 GB for all 5,190 tokens.
 2. Teacher-forced replay of the same tokens with `torch.mps.empty_cache()` every 32 steps (#265).
 3. Teacher-forced replay, mean of three runs (142.8, 150.1, 144.1 s). Native `enable_gqa` without folding: 146.4, 156.1, 157.2 s.
 4. Two measured neighbours of this branch's configuration, each one full synthesis: torch 2.14.1 with one native SDPA call per layer, 224.8 s; torch 2.10.0 with the Metal kernel, 225.1 s. This branch keeps the kernel because it was faster than the native call on longer songs in our own use.
-5. Measured on torch 2.10.0 in the upstream run; not timed separately on this branch.
+5. Both about 39–40 tokens/s. The seeded score differs between torch versions, so its length differs too.
 
 Totals are sums of the stage measurements, each taken after a cool-down; a back-to-back run on a warm laptop is slower.
 
