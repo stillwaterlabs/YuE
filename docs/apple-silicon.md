@@ -1,13 +1,13 @@
 # YuE2 on Apple Silicon
 
-This branch runs YuE2 on Apple Silicon Macs about twice as fast as upstream `main`, and makes MPS generation reproducible. It is a small set of changes on top of upstream `main` @ 1647252; the model, sampling and outputs format are unchanged.
+The `apple-silicon` branch of this fork runs YuE2 on Apple Silicon Macs about twice as fast as upstream `main`. It is a small set of changes on top of upstream `main` @ 1647252; the model, sampling and outputs format are unchanged.
 
 ## Install
 
 macOS 14 or later, Python 3.12, an Apple Silicon Mac with enough unified memory for the 3B model (tested on 64 GB).
 
 ```bash
-git clone -b apple-silicon https://github.com/zequnyu/YuE.git
+git clone -b apple-silicon https://github.com/stillwaterlabs/YuE.git
 cd YuE
 python3.12 -m venv .venv
 source .venv/bin/activate

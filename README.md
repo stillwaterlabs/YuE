@@ -1,4 +1,58 @@
-> **Apple Silicon branch.** This fork's `apple-silicon` branch runs YuE2 on Apple Silicon Macs about twice as fast as upstream `main` and makes MPS generation reproducible. See [docs/apple-silicon.md](docs/apple-silicon.md) for install steps, changes and benchmarks.
+> ## YuE2 for Apple Silicon
+>
+> This fork by [Stillwater Labs](https://github.com/stillwaterlabs) runs YuE2 on Apple Silicon Macs about twice as fast as the official release.
+>
+> ```bash
+> git clone -b apple-silicon https://github.com/stillwaterlabs/YuE.git
+> cd YuE
+> python3.12 -m venv .venv && source .venv/bin/activate
+> python -m pip install .
+> yue2 generate --device mps --request examples/song.json --output outputs/first-song
+> ```
+>
+> | Stage | Official | This fork | Speed-up |
+> |---|---:|---:|---:|
+> | Score planning | 32 s | 30 s | 1.1× |
+> | Token generation | 231 s¹ | 146 s | 1.6× |
+> | Audio synthesis | 598 s | 225 s | 2.7× |
+> | Audio decoding | 9 s | 5 s | 1.8× |
+> | **Total** | **870 s (14.5 min)** | **406 s (6.8 min)** | **2.1×** |
+>
+> Tested with *Amazing Grace* (public domain, 3:28) on a MacBook Pro with M3 Max.
+>
+> ¹ The official release's memory use climbs past 48.9 GB on this song, and it does not finish on a 64 GB Mac. 231 s was measured with the cache released by hand.
+>
+> Changes and how we measured: [docs/apple-silicon.md](docs/apple-silicon.md).
+
+> ## YuE2 Mac 优化版
+>
+> 这是 [Stillwater Labs](https://github.com/stillwaterlabs) 维护的 fork，让 YuE2 在 Apple Silicon 芯片的 Mac 上运行，速度大约是官方版的两倍。
+>
+> ```bash
+> git clone -b apple-silicon https://github.com/stillwaterlabs/YuE.git
+> cd YuE
+> python3.12 -m venv .venv && source .venv/bin/activate
+> python -m pip install .
+> yue2 generate --device mps --request examples/song.json --output outputs/first-song
+> ```
+>
+> | 阶段 | 官方版 | 本 fork | 提速 |
+> |---|---:|---:|---:|
+> | 写乐谱 | 32 秒 | 30 秒 | 1.1 倍 |
+> | 生成 token | 231 秒¹ | 146 秒 | 1.6 倍 |
+> | 合成音频 | 598 秒 | 225 秒 | 2.7 倍 |
+> | 解码音频 | 9 秒 | 5 秒 | 1.8 倍 |
+> | **合计** | **870 秒（14.5 分钟）** | **406 秒（6.8 分钟）** | **2.1 倍** |
+>
+> 测试歌曲是《Amazing Grace》（公有领域，3 分 28 秒），机器是 MacBook Pro M3 Max。
+>
+> ¹ 官方版生成这首歌时，内存占用一路涨到 48.9 GB 以上，在 64 GB 的 Mac 上跑不完。231 秒是手动释放缓存后测得的。
+>
+> 改动和测速方法见 [docs/apple-silicon.md](docs/apple-silicon.md)。
+
+---
+
+*Below is the official README.*
 
 > Looking for the original YuE? Its code, documentation, and license are preserved on the **[YuE-v1 branch](https://github.com/multimodal-art-projection/YuE/tree/YuE-v1)**.
 
