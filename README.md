@@ -1,3 +1,5 @@
+> **Apple Silicon branch.** This fork's `apple-silicon` branch runs YuE2 on Apple Silicon Macs about twice as fast as upstream `main` and makes MPS generation reproducible. See [docs/apple-silicon.md](docs/apple-silicon.md) for install steps, changes and benchmarks.
+
 > Looking for the original YuE? Its code, documentation, and license are preserved on the **[YuE-v1 branch](https://github.com/multimodal-art-projection/YuE/tree/YuE-v1)**.
 
 <p align="center">

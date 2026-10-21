@@ -67,15 +67,21 @@ def attention(q, k, v, *, causal=False, backend="sdpa", query_chunk_size=None):
     if query_chunk_size is not None and (isinstance(query_chunk_size, bool) or
                                         not isinstance(query_chunk_size, Integral) or query_chunk_size < 1):
         raise ValueError("query_chunk_size must be a positive integer")
+    if q.device.type == "mps" and not causal and backend == "sdpa" and query_chunk_size is None:
+        from . import mps_attention
+        if mps_attention.supported(q, k, v):
+            # Local fused Metal kernel for YuE2's acoustic attention shapes.
+            return mps_attention.attention(q, k, v)
+        # torch 2.13+ runs long-query MPS SDPA as a fused prefill kernel that handles GQA
+        # itself, so one call avoids both the KV copy and the 256-row query blocks.
+        out = F.scaled_dot_product_attention(q.transpose(0, 1)[None], k.transpose(0, 1)[None],
+                                             v.transpose(0, 1)[None], enable_gqa=q.shape[1] != k.shape[1])
+        return out[0].transpose(0, 1)
     block = query_chunk_size or (len(q) if q.device.type == "cuda" and backend != "math" else 256)
     query = q.transpose(0, 1).unsqueeze(0)
     key = k.transpose(0, 1).unsqueeze(0)
     value = v.transpose(0, 1).unsqueeze(0)
     grouped = query.shape[1] != key.shape[1]
-    if grouped and q.device.type == "mps":
-        groups = query.shape[1] // key.shape[1]
-        key, value = key.repeat_interleave(groups, 1), value.repeat_interleave(groups, 1)
-        grouped = False
     context = nullcontext()
     if backend != "sdpa":
         from torch.nn.attention import SDPBackend, sdpa_kernel
